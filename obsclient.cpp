@@ -1,104 +1,54 @@
 #include "obsclient.h"
 
+#include <QCryptographicHash>
 #include <QJsonDocument>
 #include <QJsonObject>
-#include <QCryptographicHash>
-#include <QDebug>
+#include <QJsonValue>
+#include <QUuid>
 
 OBSClient::OBSClient(QObject *parent)
     : QObject(parent)
 {
     connect(&m_socket, &QWebSocket::connected,
             this, &OBSClient::onConnected);
-
+    connect(&m_socket, &QWebSocket::disconnected,
+            this, &OBSClient::onDisconnected);
     connect(&m_socket, &QWebSocket::textMessageReceived,
             this, &OBSClient::onTextMessageReceived);
+
+    connect(&m_socket,
+            QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::error),
+            this,
+            &OBSClient::onSocketError);
 }
 
 void OBSClient::connectToObs(const QUrl &url)
 {
+    m_authenticated = false;
     m_socket.open(url);
 }
 
-void OBSClient::onConnected()
+void OBSClient::disconnectFromObs()
 {
-    qDebug() << "WebSocket connected, waiting for OBS Hello...";
-}
-
-void OBSClient::onTextMessageReceived(const QString &message)
-{
-    QJsonDocument doc = QJsonDocument::fromJson(message.toUtf8());
-    QJsonObject root = doc.object();
-
-    int op = root.value("op").toInt();
-    QJsonObject d = root.value("d").toObject();
-
-    // OBS Hello
-    if (op == 0) {
-        qDebug() << "Received Hello";
-        qDebug()<< message;
-
-        if (d.contains("authentication")) {
-            QJsonObject auth = d["authentication"].toObject();
-
-            QString salt = auth["salt"].toString();
-            QString challenge = auth["challenge"].toString();
-
-            QString authResponse =
-                createAuthResponse(m_password, salt, challenge);
-
-            QJsonObject identify;
-            identify["op"] = 1;
-            identify["d"] = QJsonObject{
-                {"rpcVersion", 1},
-                {"authentication", authResponse}
-            };
-
-            m_socket.sendTextMessage(
-                QJsonDocument(identify).toJson(QJsonDocument::Compact)
-                );
-        }
-        return;
-    }
-
-    // OBS Identified (success)
-    if (op == 2) {
-        qDebug() << "Authenticated successfully";
-        emit authenticated();
-        return;
-    }
-
-    emit messageReceived(root);
-}
-
-QString OBSClient::createAuthResponse(const QString &password,
-                                      const QString &salt,
-                                      const QString &challenge)
-{
-    // Step 1: base64(SHA256(password + salt))
-    QByteArray secret = password.toUtf8() + salt.toUtf8();
-    QByteArray secretHash =
-        QCryptographicHash::hash(secret, QCryptographicHash::Sha256)
-            .toBase64();
-
-    // Step 2: base64(SHA256(secretHash + challenge))
-    QByteArray authResponse =
-        QCryptographicHash::hash(secretHash + challenge.toUtf8(),
-                                 QCryptographicHash::Sha256)
-            .toBase64();
-
-    return QString::fromUtf8(authResponse);
+    m_authenticated = false;
+    m_socket.close();
 }
 
 void OBSClient::sendRequest(const QString &type,
                             const QJsonObject &data,
                             const QString &requestId)
 {
+    if (!isConnected() || !isAuthenticated()) {
+        emit errorOccurred(QStringLiteral("Cannot send %1 before OBS authentication completes.")
+                               .arg(type));
+        return;
+    }
+
     QJsonObject msg;
     msg["op"] = 6;
     msg["d"] = QJsonObject{
         {"requestType", type},
-        {"requestId", requestId},
+        {"requestId", requestId.isEmpty() ? nextRequestId() : requestId},
         {"requestData", data}
     };
 
@@ -110,4 +60,122 @@ void OBSClient::sendRequest(const QString &type,
 void OBSClient::setPassword(const QString &password)
 {
     m_password = password;
+}
+
+bool OBSClient::isConnected() const
+{
+    return m_socket.state() == QAbstractSocket::ConnectedState;
+}
+
+bool OBSClient::isAuthenticated() const
+{
+    return m_authenticated;
+}
+
+void OBSClient::onConnected()
+{
+    emit connected();
+}
+
+void OBSClient::onDisconnected()
+{
+    m_authenticated = false;
+    emit disconnected();
+}
+
+void OBSClient::onTextMessageReceived(const QString &message)
+{
+    const QJsonDocument doc = QJsonDocument::fromJson(message.toUtf8());
+    if (!doc.isObject()) {
+        emit errorOccurred(QStringLiteral("OBS sent a non-JSON message."));
+        return;
+    }
+
+    const QJsonObject root = doc.object();
+    const int op = root.value("op").toInt(-1);
+    const QJsonObject d = root.value("d").toObject();
+
+    if (op == 0) {
+        const QJsonObject auth = d.value("authentication").toObject();
+        const QString salt = auth.value("salt").toString();
+        const QString challenge = auth.value("challenge").toString();
+
+        if (!auth.isEmpty()) {
+            sendIdentify(createAuthResponse(m_password, salt, challenge));
+        } else {
+            sendIdentify();
+        }
+
+        return;
+    }
+
+    if (op == 2) {
+        m_authenticated = true;
+        emit authenticated();
+        return;
+    }
+
+    if (op == 7) {
+        const QJsonObject requestStatus = d.value("requestStatus").toObject();
+        const bool result = requestStatus.value("result").toBool();
+        const QString requestType = d.value("requestType").toString();
+        const QString requestId = d.value("requestId").toString();
+        const QString comment = requestStatus.value("comment").toString();
+        const int code = requestStatus.value("code").toInt();
+
+        if (result) {
+            emit requestSucceeded(requestType, requestId);
+        } else {
+            emit requestFailed(requestType, requestId, comment, code);
+        }
+    }
+
+    emit messageReceived(root);
+}
+
+void OBSClient::onSocketError(QAbstractSocket::SocketError error)
+{
+    Q_UNUSED(error)
+    emit errorOccurred(m_socket.errorString());
+}
+
+QString OBSClient::createAuthResponse(const QString &password,
+                                      const QString &salt,
+                                      const QString &challenge) const
+{
+    const QByteArray secret = password.toUtf8() + salt.toUtf8();
+    const QByteArray secretHash =
+        QCryptographicHash::hash(secret, QCryptographicHash::Sha256)
+            .toBase64();
+
+    const QByteArray authResponse =
+        QCryptographicHash::hash(secretHash + challenge.toUtf8(),
+                                 QCryptographicHash::Sha256)
+            .toBase64();
+
+    return QString::fromUtf8(authResponse);
+}
+
+QString OBSClient::nextRequestId() const
+{
+    return QUuid::createUuid().toString(QUuid::WithoutBraces);
+}
+
+void OBSClient::sendIdentify(const QString &authentication)
+{
+    QJsonObject identifyData{
+        {"rpcVersion", 1}
+    };
+
+    if (!authentication.isEmpty()) {
+        identifyData["authentication"] = authentication;
+    }
+
+    QJsonObject identify;
+    identify["op"] = 1;
+    identify["d"] = identifyData;
+
+    m_socket.sendTextMessage(
+        QJsonDocument(identify).toJson(QJsonDocument::Compact)
+        );
 }
