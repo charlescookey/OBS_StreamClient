@@ -1,47 +1,56 @@
 # OBS Stream Client
 
-`OBS Stream Client` is a Qt Widgets desktop app for controlling up to two OBS Studio instances over the OBS WebSocket protocol.
+`OBS Stream Client` is a Qt Widgets desktop app for controlling multiple OBS Studio instances over the OBS WebSocket protocol.
 
-The app now includes a proper settings screen, a separate controls tab, saved connection profiles, per-client status, and broadcast actions for common stream operations.
+The current app supports up to 20 saved clients, a dedicated status view, single-client editing in the settings tab, and a dropdown-driven control panel for the currently selected OBS target.
 
 ## Features
 
-- Two configurable OBS client profiles
-- Saved host, port, password, scene, and scene collection settings via `QSettings`
-- Separate `Settings` and `Controls` tabs
-- Per-client connection status and activity log
-- Per-client actions:
+- Up to 20 configurable OBS client profiles
+- Local settings storage with `QSettings`
+- Three-tab layout:
+  - `Status`
+  - `Settings`
+  - `Controls`
+- Status table for all clients with connection state
+- Red/green status coloring for disconnected vs connected clients
+- Single-profile editing flow with `New Client`
+- Single-client control panel selected from a dropdown
+- Broadcast actions for all saved clients
+- OBS WebSocket authentication and request handling
+
+## UI Overview
+
+### Status Tab
+
+- Lists all saved clients
+- Shows endpoint and connection state
+- Uses green for connected clients and red for disconnected clients
+- Includes `Connect Selected` and `Disconnect Selected`
+
+### Settings Tab
+
+- Edits one client at a time
+- Lets you switch between clients with a selector
+- Adds new client profiles with `New Client`
+- Stores name, host, port, and password
+- Stores default scene and scene collection values
+- Lets you load available scene collections from the currently connected selected client with `Load From OBS`
+
+### Controls Tab
+
+- Keeps broadcast controls for all clients
+- Uses a dropdown to pick one active client
+- Shows the selected client's name, endpoint, and state
+- Provides actions for the selected client:
   - connect
   - disconnect
-  - switch program scene
+  - switch scene
   - apply scene collection
   - start stream
   - stop stream
   - start recording
   - stop recording
-- Broadcast actions that run the same command on both configured clients
-- OBS WebSocket authentication handling for OBS v5-style handshake
-
-## UI Overview
-
-### Settings Tab
-
-Use the `Settings` tab to configure:
-
-- Client 1 name, host, port, and password
-- Client 2 name, host, port, and password
-- Default program scene name
-- Default scene collection name
-
-Press `Save Settings` to persist the configuration locally.
-
-### Controls Tab
-
-Use the `Controls` tab for live operation:
-
-- `Broadcast Controls` for connect/disconnect, scene switching, scene collection changes, streaming, and recording across all configured clients
-- Individual client panels for one-off actions on a single OBS instance
-- A live activity log showing connection, authentication, and request results
 
 ## Requirements
 
@@ -55,57 +64,25 @@ Use the `Controls` tab for live operation:
 
 ## Build
 
-### Command Line
-
 ```bash
 qmake6 TestOBS.pro
 make
 ./TestOBS
 ```
 
-If your system exposes a configured `qmake`, that should work too. In this environment the verified build command was `qmake6 TestOBS.pro`.
-
-### Qt Creator
-
-1. Open [`TestOBS.pro`](/home/aru/side_work/OBS_StreamClient/TestOBS.pro).
-2. Select a Qt kit with the WebSockets module installed.
-3. Build and run the project.
+The current code was verified with `qmake6` and `make`.
 
 ## Project Structure
 
-- [`main.cpp`](/home/aru/side_work/OBS_StreamClient/main.cpp): Qt application entry point
-- [`mainwindow.h`](/home/aru/side_work/OBS_StreamClient/mainwindow.h): main window declarations and app state
-- [`mainwindow.cpp`](/home/aru/side_work/OBS_StreamClient/mainwindow.cpp): UI wiring, settings persistence, status updates, and OBS control actions
-- [`mainwindow.ui`](/home/aru/side_work/OBS_StreamClient/mainwindow.ui): tabbed Qt Designer UI
+- [`main.cpp`](/home/aru/side_work/OBS_StreamClient/main.cpp): Qt entry point
+- [`mainwindow.h`](/home/aru/side_work/OBS_StreamClient/mainwindow.h): main window declarations and client model
+- [`mainwindow.cpp`](/home/aru/side_work/OBS_StreamClient/mainwindow.cpp): UI wiring, settings persistence, client status updates, and OBS actions
+- [`mainwindow.ui`](/home/aru/side_work/OBS_StreamClient/mainwindow.ui): three-tab Qt Designer layout
 - [`obsclient.h`](/home/aru/side_work/OBS_StreamClient/obsclient.h): OBS WebSocket client API
-- [`obsclient.cpp`](/home/aru/side_work/OBS_StreamClient/obsclient.cpp): authentication, request dispatch, and response/error handling
-
-## How It Works
-
-When the app connects to OBS:
-
-1. A WebSocket connection is opened.
-2. OBS sends its `Hello` message.
-3. The app computes the authentication response if OBS requires it.
-4. The app sends `Identify`.
-5. After authentication succeeds, UI actions send OBS requests such as:
-   - `SetCurrentProgramScene`
-   - `SetCurrentSceneCollection`
-   - `StartStream`
-   - `StopStream`
-   - `StartRecord`
-   - `StopRecord`
+- [`obsclient.cpp`](/home/aru/side_work/OBS_StreamClient/obsclient.cpp): connection, authentication, request, and error handling
 
 ## Notes
 
-- Settings are stored locally using `QSettings`.
-- Passwords are no longer hardcoded in source, but they are still stored locally in app settings.
-- The app currently supports two OBS targets. If you need more, the current structure is ready to be generalized further.
-
-## Future Improvements
-
-- Add scene and scene collection discovery directly from OBS instead of manual text entry
-- Add visual badges or colored indicators for connection and auth state
-- Add support for stream/record state polling
-- Expand from two fixed clients to a dynamic client list
-- Offer secure secret storage instead of plain local settings
+- Passwords are no longer hardcoded in source.
+- Passwords are still stored locally in app settings, so this is convenient but not hardened secret storage.
+- The app is now structured for many saved clients, but the UI intentionally edits and controls one selected client at a time.

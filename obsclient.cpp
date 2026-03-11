@@ -124,7 +124,9 @@ void OBSClient::onTextMessageReceived(const QString &message)
         const int code = requestStatus.value("code").toInt();
 
         if (result) {
-            emit requestSucceeded(requestType, requestId);
+            emit requestSucceeded(requestType,
+                                  requestId,
+                                  d.value("responseData").toObject());
         } else {
             emit requestFailed(requestType, requestId, comment, code);
         }

@@ -3,9 +3,10 @@
 
 #include <QMainWindow>
 
-#include <array>
 #include <functional>
+#include <map>
 #include <memory>
+#include <vector>
 
 #include "obsclient.h"
 
@@ -15,7 +16,7 @@ class MainWindow;
 }
 QT_END_NAMESPACE
 
-class QLabel;
+class QColor;
 
 class MainWindow : public QMainWindow
 {
@@ -27,6 +28,21 @@ public:
 
 private slots:
     void onSaveSettingsClicked();
+    void onAddClientClicked();
+    void onSettingsClientChanged(int index);
+    void onControlsClientChanged(int index);
+    void onRefreshSceneCollectionsClicked();
+    void onStatusSelectionChanged();
+    void onConnectSelectedStatusClicked();
+    void onDisconnectSelectedStatusClicked();
+    void onConnectSelectedControlClicked();
+    void onDisconnectSelectedControlClicked();
+    void onApplySceneSelectedClicked();
+    void onApplySceneCollectionSelectedClicked();
+    void onStartStreamSelectedClicked();
+    void onStopStreamSelectedClicked();
+    void onStartRecordingSelectedClicked();
+    void onStopRecordingSelectedClicked();
     void onConnectAllClicked();
     void onDisconnectAllClicked();
     void onApplySceneAllClicked();
@@ -44,16 +60,31 @@ private:
         QString password;
     };
 
+    struct ClientEntry {
+        ClientConfig config;
+        std::unique_ptr<OBSClient> client;
+        QString state;
+        QString detail;
+    };
+
     void setupConnections();
     void applyWindowStyle();
     void loadSettings();
     void saveSettings();
-    ClientConfig readClientConfigFromUi(int index) const;
-    void writeClientConfigToUi(int index, const ClientConfig &config);
-    QUrl buildUrl(const ClientConfig &config) const;
-    QString sceneName() const;
-    QString sceneCollectionName() const;
-    QString clientDisplayName(int index) const;
+    void addClient(const ClientConfig &config);
+    void attachClientSignals(int index);
+    void updateCurrentSettingsClientFromUi();
+    void loadClientIntoSettingsForm(int index);
+    void refreshClientSelectors();
+    void refreshStatusTable();
+    void refreshStatusButtons();
+    void refreshControlsPanel();
+    void populateSceneCollections(const QStringList &sceneCollections,
+                                  const QString &selectedValue);
+    void updateClientStatus(int index,
+                            const QString &state,
+                            const QString &detail = QString());
+    void broadcast(const std::function<void(int)> &operation);
     void connectClient(int index);
     void disconnectClient(int index);
     void switchSceneForClient(int index);
@@ -62,14 +93,20 @@ private:
     void stopStreamForClient(int index);
     void startRecordingForClient(int index);
     void stopRecordingForClient(int index);
-    void broadcast(const std::function<void(int)> &operation);
-    void updateClientStatus(int index,
-                            const QString &state,
-                            const QString &detail = QString());
     void appendLog(const QString &message);
+    QUrl buildUrl(const ClientConfig &config) const;
+    QString sceneName() const;
+    QString sceneCollectionName() const;
+    QString clientDisplayName(int index) const;
+    QString endpointLabel(const ClientConfig &config) const;
+    QColor statusColorForIndex(int index) const;
+    int selectedStatusIndex() const;
+    int selectedControlsIndex() const;
 
     Ui::MainWindow *ui;
-    std::array<std::unique_ptr<OBSClient>, 2> m_clients;
+    std::vector<ClientEntry> m_clients;
+    std::map<QString, int> m_sceneCollectionRequests;
+    bool m_syncingUi = false;
 };
 
 #endif // MAINWINDOW_H

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1180</width>
-    <height>820</height>
+    <width>1200</width>
+    <height>860</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -49,11 +49,11 @@
        <item>
         <widget class="QLabel" name="heroSubtitleLabel">
          <property name="text">
-          <string>Manage multiple OBS WebSocket targets, save connection profiles, and run stream actions from a cleaner control surface.</string>
+          <string>Track connection state, add up to 20 OBS clients, and control one selected studio at a time while keeping broadcast actions available.</string>
          </property>
-          <property name="wordWrap">
-           <bool>true</bool>
-          </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
         </widget>
        </item>
       </layout>
@@ -64,29 +64,182 @@
       <property name="currentIndex">
        <number>0</number>
       </property>
-      <widget class="QWidget" name="settingsTab">
+      <widget class="QWidget" name="statusTab">
        <attribute name="title">
-        <string>Settings</string>
+        <string>Status</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_3">
         <property name="spacing">
          <number>16</number>
         </property>
         <item>
-         <widget class="QGroupBox" name="clientsSettingsGroup">
+         <widget class="QGroupBox" name="statusGroup">
           <property name="title">
-           <string>OBS Client Profiles</string>
+           <string>All Clients</string>
           </property>
-          <layout class="QHBoxLayout" name="horizontalLayout">
+          <layout class="QVBoxLayout" name="verticalLayout_4">
            <property name="spacing">
-            <number>16</number>
+            <number>12</number>
            </property>
            <item>
-            <widget class="QGroupBox" name="client1SettingsGroup">
-             <property name="title">
-              <string>Client 1</string>
+            <widget class="QLabel" name="statusHintLabel">
+             <property name="text">
+              <string>Select a client in the list, then use the buttons below to connect or disconnect it. Green means connected, red means not connected.</string>
+             </property>
+             <property name="wordWrap">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QTableWidget" name="statusTable">
+             <property name="columnCount">
+              <number>3</number>
+             </property>
+             <property name="rowCount">
+              <number>0</number>
+             </property>
+             <property name="selectionBehavior">
+              <enum>QAbstractItemView::SelectRows</enum>
+             </property>
+             <property name="selectionMode">
+              <enum>QAbstractItemView::SingleSelection</enum>
+             </property>
+             <property name="editTriggers">
+              <set>QAbstractItemView::NoEditTriggers</set>
+             </property>
+             <property name="alternatingRowColors">
+              <bool>false</bool>
+             </property>
+             <column>
+              <property name="text">
+               <string>Client</string>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string>Endpoint</string>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string>Status</string>
+              </property>
+             </column>
+            </widget>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout">
+             <property name="spacing">
+              <number>12</number>
+             </property>
+             <item>
+              <widget class="QPushButton" name="connectSelectedStatusButton">
+               <property name="text">
+                <string>Connect Selected</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="disconnectSelectedStatusButton">
+               <property name="text">
+                <string>Disconnect Selected</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="settingsTab">
+       <attribute name="title">
+        <string>Settings</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_5">
+        <property name="spacing">
+         <number>16</number>
+        </property>
+        <item>
+         <widget class="QGroupBox" name="settingsClientGroup">
+          <property name="title">
+           <string>Client Profile</string>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_6">
+           <property name="spacing">
+            <number>14</number>
+           </property>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_2">
+             <property name="spacing">
+              <number>12</number>
+             </property>
+             <item>
+              <widget class="QLabel" name="settingsClientSelectorLabel">
+               <property name="text">
+                <string>Editing</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QComboBox" name="settingsClientSelector"/>
+             </item>
+             <item>
+              <widget class="QPushButton" name="addClientButton">
+               <property name="text">
+                <string>New Client</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="clientLimitLabel">
+               <property name="text">
+                <string>0 / 20 client slots used</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_2">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <widget class="QFrame" name="settingsCardFrame">
+             <property name="frameShape">
+              <enum>QFrame::StyledPanel</enum>
              </property>
              <layout class="QFormLayout" name="formLayout">
+              <property name="horizontalSpacing">
+               <number>16</number>
+              </property>
+              <property name="verticalSpacing">
+               <number>14</number>
+              </property>
               <property name="labelAlignment">
                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
               </property>
@@ -98,7 +251,7 @@
                </widget>
               </item>
               <item row="0" column="1">
-               <widget class="QLineEdit" name="client1NameEdit">
+               <widget class="QLineEdit" name="clientNameEdit">
                 <property name="placeholderText">
                  <string>Main Studio</string>
                 </property>
@@ -112,7 +265,7 @@
                </widget>
               </item>
               <item row="1" column="1">
-               <widget class="QLineEdit" name="client1HostEdit">
+               <widget class="QLineEdit" name="clientHostEdit">
                 <property name="placeholderText">
                  <string>192.168.1.10 or ws://192.168.1.10</string>
                 </property>
@@ -126,7 +279,7 @@
                </widget>
               </item>
               <item row="2" column="1">
-               <widget class="QSpinBox" name="client1PortSpinBox">
+               <widget class="QSpinBox" name="clientPortSpinBox">
                 <property name="maximum">
                  <number>65535</number>
                 </property>
@@ -143,81 +296,7 @@
                </widget>
               </item>
               <item row="3" column="1">
-               <widget class="QLineEdit" name="client1PasswordEdit">
-                <property name="echoMode">
-                 <enum>QLineEdit::Password</enum>
-                </property>
-                <property name="placeholderText">
-                 <string>OBS websocket password</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </widget>
-           </item>
-           <item>
-            <widget class="QGroupBox" name="client2SettingsGroup">
-             <property name="title">
-              <string>Client 2</string>
-             </property>
-             <layout class="QFormLayout" name="formLayout_2">
-              <property name="labelAlignment">
-               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-              </property>
-              <item row="0" column="0">
-               <widget class="QLabel" name="label_5">
-                <property name="text">
-                 <string>Name</string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="1">
-               <widget class="QLineEdit" name="client2NameEdit">
-                <property name="placeholderText">
-                 <string>Backup Studio</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="0">
-               <widget class="QLabel" name="label_6">
-                <property name="text">
-                 <string>Host / URL</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="1">
-               <widget class="QLineEdit" name="client2HostEdit">
-                <property name="placeholderText">
-                 <string>192.168.1.20 or ws://192.168.1.20</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="0">
-               <widget class="QLabel" name="label_7">
-                <property name="text">
-                 <string>Port</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="1">
-               <widget class="QSpinBox" name="client2PortSpinBox">
-                <property name="maximum">
-                 <number>65535</number>
-                </property>
-                <property name="value">
-                 <number>4455</number>
-                </property>
-               </widget>
-              </item>
-              <item row="3" column="0">
-               <widget class="QLabel" name="label_8">
-                <property name="text">
-                 <string>Password</string>
-                </property>
-               </widget>
-              </item>
-              <item row="3" column="1">
-               <widget class="QLineEdit" name="client2PasswordEdit">
+               <widget class="QLineEdit" name="clientPasswordEdit">
                 <property name="echoMode">
                  <enum>QLineEdit::Password</enum>
                 </property>
@@ -237,12 +316,18 @@
           <property name="title">
            <string>Default Actions</string>
           </property>
-          <layout class="QFormLayout" name="formLayout_3">
+          <layout class="QFormLayout" name="formLayout_2">
+           <property name="horizontalSpacing">
+            <number>16</number>
+           </property>
+           <property name="verticalSpacing">
+            <number>14</number>
+           </property>
            <property name="labelAlignment">
             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
            </property>
            <item row="0" column="0">
-            <widget class="QLabel" name="label_9">
+            <widget class="QLabel" name="label_5">
              <property name="text">
               <string>Program Scene</string>
              </property>
@@ -256,26 +341,43 @@
             </widget>
            </item>
            <item row="1" column="0">
-            <widget class="QLabel" name="label_10">
+            <widget class="QLabel" name="label_6">
              <property name="text">
               <string>Scene Collection</string>
              </property>
             </widget>
            </item>
            <item row="1" column="1">
-            <widget class="QLineEdit" name="sceneCollectionEdit">
-             <property name="placeholderText">
-              <string>Optional scene collection name</string>
+            <layout class="QHBoxLayout" name="horizontalLayout_6">
+             <property name="spacing">
+              <number>10</number>
              </property>
-            </widget>
+             <item>
+              <widget class="QComboBox" name="sceneCollectionComboBox">
+               <property name="editable">
+                <bool>true</bool>
+               </property>
+               <property name="insertPolicy">
+                <enum>QComboBox::NoInsert</enum>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="refreshSceneCollectionsButton">
+               <property name="text">
+                <string>Load From OBS</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
            </item>
           </layout>
          </widget>
         </item>
         <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <layout class="QHBoxLayout" name="horizontalLayout_3">
           <item>
-           <spacer name="horizontalSpacer">
+           <spacer name="horizontalSpacer_3">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
             </property>
@@ -302,7 +404,7 @@
        <attribute name="title">
         <string>Controls</string>
        </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_4">
+       <layout class="QVBoxLayout" name="verticalLayout_7">
         <property name="spacing">
          <number>16</number>
         </property>
@@ -378,202 +480,185 @@
          </widget>
         </item>
         <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_3">
-          <property name="spacing">
-           <number>16</number>
+         <widget class="QGroupBox" name="singleClientControlsGroup">
+          <property name="title">
+           <string>Selected Client</string>
           </property>
-          <item>
-           <widget class="QGroupBox" name="client1ControlsGroup">
-            <property name="title">
-             <string>Client 1</string>
-            </property>
-            <layout class="QVBoxLayout" name="verticalLayout_5">
+          <layout class="QVBoxLayout" name="verticalLayout_8">
+           <property name="spacing">
+            <number>14</number>
+           </property>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_4">
              <property name="spacing">
               <number>12</number>
              </property>
              <item>
-              <widget class="QLabel" name="client1StatusLabel">
+              <widget class="QLabel" name="label_7">
                <property name="text">
-                <string>Client 1
-Idle</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-               </property>
-               <property name="wordWrap">
-                <bool>true</bool>
+                <string>Client</string>
                </property>
               </widget>
              </item>
              <item>
-              <layout class="QGridLayout" name="gridLayout_2">
-               <property name="horizontalSpacing">
-                <number>10</number>
+              <widget class="QComboBox" name="controlsClientSelector"/>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_4">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
                </property>
-               <property name="verticalSpacing">
-                <number>10</number>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
                </property>
-               <item row="0" column="0">
-                <widget class="QPushButton" name="client1ConnectButton">
-                 <property name="text">
-                  <string>Connect</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="0" column="1">
-                <widget class="QPushButton" name="client1DisconnectButton">
-                 <property name="text">
-                  <string>Disconnect</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="0">
-                <widget class="QPushButton" name="client1SceneButton">
-                 <property name="text">
-                  <string>Switch Scene</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="1">
-                <widget class="QPushButton" name="client1SceneCollectionButton">
-                 <property name="text">
-                  <string>Apply Collection</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="2" column="0">
-                <widget class="QPushButton" name="client1StartStreamButton">
-                 <property name="text">
-                  <string>Start Stream</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="2" column="1">
-                <widget class="QPushButton" name="client1StopStreamButton">
-                 <property name="text">
-                  <string>Stop Stream</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="3" column="0">
-                <widget class="QPushButton" name="client1StartRecordingButton">
-                 <property name="text">
-                  <string>Start Recording</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="3" column="1">
-                <widget class="QPushButton" name="client1StopRecordingButton">
-                 <property name="text">
-                  <string>Stop Recording</string>
-                 </property>
-                </widget>
-               </item>
-              </layout>
+              </spacer>
              </item>
             </layout>
-           </widget>
-          </item>
-          <item>
-           <widget class="QGroupBox" name="client2ControlsGroup">
-            <property name="title">
-             <string>Client 2</string>
-            </property>
-            <layout class="QVBoxLayout" name="verticalLayout_6">
-             <property name="spacing">
-              <number>12</number>
+           </item>
+           <item>
+            <widget class="QFrame" name="controlCardFrame">
+             <property name="frameShape">
+              <enum>QFrame::StyledPanel</enum>
              </property>
-             <item>
-              <widget class="QLabel" name="client2StatusLabel">
-               <property name="text">
-                <string>Client 2
-Idle</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-               </property>
-               <property name="wordWrap">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <layout class="QGridLayout" name="gridLayout_3">
-               <property name="horizontalSpacing">
-                <number>10</number>
-               </property>
-               <property name="verticalSpacing">
-                <number>10</number>
-               </property>
-               <item row="0" column="0">
-                <widget class="QPushButton" name="client2ConnectButton">
-                 <property name="text">
-                  <string>Connect</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="0" column="1">
-                <widget class="QPushButton" name="client2DisconnectButton">
-                 <property name="text">
-                  <string>Disconnect</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="0">
-                <widget class="QPushButton" name="client2SceneButton">
-                 <property name="text">
-                  <string>Switch Scene</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="1">
-                <widget class="QPushButton" name="client2SceneCollectionButton">
-                 <property name="text">
-                  <string>Apply Collection</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="2" column="0">
-                <widget class="QPushButton" name="client2StartStreamButton">
-                 <property name="text">
-                  <string>Start Stream</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="2" column="1">
-                <widget class="QPushButton" name="client2StopStreamButton">
-                 <property name="text">
-                  <string>Stop Stream</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="3" column="0">
-                <widget class="QPushButton" name="client2StartRecordingButton">
-                 <property name="text">
-                  <string>Start Recording</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="3" column="1">
-                <widget class="QPushButton" name="client2StopRecordingButton">
-                 <property name="text">
-                  <string>Stop Recording</string>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </item>
-            </layout>
-           </widget>
-          </item>
-         </layout>
+             <layout class="QVBoxLayout" name="verticalLayout_9">
+              <property name="spacing">
+               <number>12</number>
+              </property>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_5">
+                <property name="spacing">
+                 <number>12</number>
+                </property>
+                <item>
+                 <widget class="QLabel" name="controlClientNameLabel">
+                  <property name="text">
+                   <string>No client selected</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLabel" name="controlStatusBadge">
+                  <property name="text">
+                   <string>Disconnected</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="horizontalSpacer_5">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <widget class="QLabel" name="controlEndpointLabel">
+                <property name="text">
+                 <string>No endpoint configured</string>
+                </property>
+                <property name="wordWrap">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="controlDetailLabel">
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="wordWrap">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <layout class="QGridLayout" name="gridLayout_2">
+                <property name="horizontalSpacing">
+                 <number>12</number>
+                </property>
+                <property name="verticalSpacing">
+                 <number>12</number>
+                </property>
+                <item row="0" column="0">
+                 <widget class="QPushButton" name="connectSelectedControlButton">
+                  <property name="text">
+                   <string>Connect</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="1">
+                 <widget class="QPushButton" name="disconnectSelectedControlButton">
+                  <property name="text">
+                   <string>Disconnect</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="0">
+                 <widget class="QPushButton" name="applySceneSelectedButton">
+                  <property name="text">
+                   <string>Switch Scene</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="1">
+                 <widget class="QPushButton" name="applySceneCollectionSelectedButton">
+                  <property name="text">
+                   <string>Apply Collection</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="0">
+                 <widget class="QPushButton" name="startStreamSelectedButton">
+                  <property name="text">
+                   <string>Start Stream</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="1">
+                 <widget class="QPushButton" name="stopStreamSelectedButton">
+                  <property name="text">
+                   <string>Stop Stream</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="3" column="0">
+                 <widget class="QPushButton" name="startRecordingSelectedButton">
+                  <property name="text">
+                   <string>Start Recording</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="3" column="1">
+                 <widget class="QPushButton" name="stopRecordingSelectedButton">
+                  <property name="text">
+                   <string>Stop Recording</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+             </layout>
+            </widget>
+           </item>
+          </layout>
+         </widget>
         </item>
         <item>
          <widget class="QGroupBox" name="activityLogGroup">
           <property name="title">
            <string>Activity Log</string>
           </property>
-          <layout class="QVBoxLayout" name="verticalLayout_7">
+          <layout class="QVBoxLayout" name="verticalLayout_10">
            <item>
             <widget class="QPlainTextEdit" name="logOutput">
              <property name="readOnly">
@@ -598,7 +683,7 @@ Idle</string>
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1180</width>
+     <width>1200</width>
      <height>28</height>
     </rect>
    </property>

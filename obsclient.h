@@ -30,7 +30,8 @@ signals:
     void authenticated();
     void errorOccurred(const QString &message);
     void requestSucceeded(const QString &requestType,
-                          const QString &requestId);
+                          const QString &requestId,
+                          const QJsonObject &responseData);
     void requestFailed(const QString &requestType,
                        const QString &requestId,
                        const QString &comment,
