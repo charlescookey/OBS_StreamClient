@@ -80,9 +80,3 @@ The current code was verified with `qmake6` and `make`.
 - [`mainwindow.ui`](/home/aru/side_work/OBS_StreamClient/mainwindow.ui): three-tab Qt Designer layout
 - [`obsclient.h`](/home/aru/side_work/OBS_StreamClient/obsclient.h): OBS WebSocket client API
 - [`obsclient.cpp`](/home/aru/side_work/OBS_StreamClient/obsclient.cpp): connection, authentication, request, and error handling
-
-## Notes
-
-- Passwords are no longer hardcoded in source.
-- Passwords are still stored locally in app settings, so this is convenient but not hardened secret storage.
-- The app is now structured for many saved clients, but the UI intentionally edits and controls one selected client at a time.
